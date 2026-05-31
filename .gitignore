@@ -1,0 +1,10 @@
+.DS_Store
+.env
+/node_modules/
+
+# ローカル専用のエージェント/プレビュー設定
+/.claude/
+
+# React Router
+/.react-router/
+/build/

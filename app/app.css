@@ -1,0 +1,64 @@
+@import "tailwindcss";
+
+/* === デザイントークン（DESIGN.md と対応） === */
+@theme {
+  --color-cream: #fff5f9;
+  --color-lavender-mist: #f3eefb;
+  --color-surface: #ffffff;
+  --color-border-soft: #ffe0ec;
+
+  --color-pink: #ff7eb6;
+  --color-pink-vivid: #ff4f9e;
+  --color-lavender: #c8b6ff;
+  --color-mint: #9ee6c4;
+  --color-lemon: #ffe9a8;
+
+  --color-ink: #5b3a52;
+  --color-ink-soft: #9b7d92;
+
+  --font-display: "Mochiy Pop One", "M PLUS Rounded 1c", sans-serif;
+  --font-sans: "M PLUS Rounded 1c", ui-sans-serif, system-ui, sans-serif;
+}
+
+html,
+body {
+  @apply text-ink;
+  font-family: var(--font-sans);
+  /* 桜色→藤色のやわらかい縦グラデ＋うっすら水玉 */
+  background-color: var(--color-cream);
+  background-image:
+    radial-gradient(var(--color-border-soft) 1px, transparent 1px),
+    linear-gradient(180deg, var(--color-cream) 0%, var(--color-lavender-mist) 100%);
+  background-size: 22px 22px, 100% 100%;
+  background-attachment: fixed;
+  min-height: 100dvh;
+}
+
+/* スクロールバーもほんのりピンクに */
+* {
+  scrollbar-color: var(--color-pink) transparent;
+}
+
+/* ✨ きらめき（控えめループ） */
+@keyframes sparkle {
+  0%, 100% { opacity: 0.4; transform: scale(0.85) rotate(0deg); }
+  50% { opacity: 1; transform: scale(1.1) rotate(15deg); }
+}
+.sparkle {
+  animation: sparkle 2.4s ease-in-out infinite;
+}
+
+@keyframes fade-in {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.fade-in {
+  animation: fade-in 0.35s ease-out both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sparkle,
+  .fade-in {
+    animation: none;
+  }
+}
