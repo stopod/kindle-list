@@ -37,7 +37,6 @@ export const library = raw as Library;
 export const allBooks: Book[] = library.books;
 export const stats: LibraryStats = library.stats;
 
-export type StatusFilter = "ALL" | "READ" | "UNKNOWN";
 export type SortKey = "date-desc" | "title-asc" | "author-asc";
 
 export const SORT_LABELS: Record<SortKey, string> = {
@@ -57,21 +56,20 @@ export interface SeriesGroup {
 
 const collator = new Intl.Collator("ja");
 
-/** 検索・絞り込み・並べ替えを適用 */
+/** 検索・並べ替えを適用 */
 export function filterAndSort(
   books: Book[],
-  opts: { query: string; status: StatusFilter; sort: SortKey }
+  opts: { query: string; sort: SortKey }
 ): Book[] {
   const q = opts.query.trim().toLowerCase();
-  let out = books.filter((b) => {
-    if (opts.status !== "ALL" && b.status !== opts.status) return false;
-    if (!q) return true;
-    return (
-      b.title.toLowerCase().includes(q) ||
-      b.authors.toLowerCase().includes(q) ||
-      b.series.toLowerCase().includes(q)
-    );
-  });
+  let out = q
+    ? books.filter(
+        (b) =>
+          b.title.toLowerCase().includes(q) ||
+          b.authors.toLowerCase().includes(q) ||
+          b.series.toLowerCase().includes(q)
+      )
+    : books.slice();
 
   out = [...out].sort((a, b) => {
     switch (opts.sort) {

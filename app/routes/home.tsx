@@ -1,4 +1,10 @@
 import { useMemo, useState } from "react";
+import {
+  PiBooksDuotone,
+  PiMagnifyingGlassBold,
+  PiStackDuotone,
+  PiBookmarksSimpleDuotone,
+} from "react-icons/pi";
 import type { Route } from "./+types/home";
 import {
   allBooks,
@@ -7,14 +13,13 @@ import {
   groupBySeries,
   SORT_LABELS,
   type SortKey,
-  type StatusFilter,
 } from "~/lib/books";
 import { BookCard } from "~/components/BookCard";
 import { SeriesCard } from "~/components/SeriesCard";
 
 export function meta({}: Route.MetaArgs) {
   return [
-    { title: "🎀 きんどる本棚" },
+    { title: "きんどる本棚" },
     {
       name: "description",
       content: "わたしの Kindle 蔵書ギャラリー。ピンクとパステルの本棚をのぞき見。",
@@ -22,23 +27,16 @@ export function meta({}: Route.MetaArgs) {
   ];
 }
 
-const STATUS_CHIPS: { key: StatusFilter; label: string }[] = [
-  { key: "ALL", label: "すべて" },
-  { key: "READ", label: "既読" },
-  { key: "UNKNOWN", label: "未確認" },
-];
-
 const numberFmt = new Intl.NumberFormat("ja-JP");
 
 export default function Home() {
   const [query, setQuery] = useState("");
-  const [status, setStatus] = useState<StatusFilter>("ALL");
   const [sort, setSort] = useState<SortKey>("date-desc");
   const [grouped, setGrouped] = useState(false);
 
   const filtered = useMemo(
-    () => filterAndSort(allBooks, { query, status, sort }),
-    [query, status, sort]
+    () => filterAndSort(allBooks, { query, sort }),
+    [query, sort]
   );
   const groups = useMemo(
     () => (grouped ? groupBySeries(filtered) : []),
@@ -54,8 +52,6 @@ export default function Home() {
       <Toolbar
         query={query}
         setQuery={setQuery}
-        status={status}
-        setStatus={setStatus}
         sort={sort}
         setSort={setSort}
         grouped={grouped}
@@ -96,17 +92,17 @@ function Grid({ children }: { children: React.ReactNode }) {
 
 function Header() {
   const pills = [
-    { label: "全", value: stats.total, tone: "bg-pink/15 text-pink-vivid" },
-    { label: "既読", value: stats.read, tone: "bg-mint/30 text-emerald-800" },
-    { label: "未確認", value: stats.unknown, tone: "bg-lavender/30 text-indigo-900/80" },
-    { label: "シリーズ", value: stats.seriesCount, tone: "bg-lemon/40 text-amber-800" },
+    { label: "蔵書", value: stats.total, tone: "bg-pink/15 text-pink-vivid" },
+    { label: "シリーズ", value: stats.seriesCount, tone: "bg-lavender/30 text-indigo-900/80" },
+    { label: "著者", value: stats.authorCount, tone: "bg-lemon/40 text-amber-800" },
   ];
   return (
     <header className="relative overflow-hidden">
       <div className="mx-auto flex max-w-7xl flex-col gap-4 px-4 pb-8 pt-10 sm:px-6 sm:pb-10 lg:px-8">
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2.5">
+          <PiBooksDuotone className="text-3xl text-pink-vivid sm:text-4xl" aria-hidden="true" />
           <h1 className="font-display text-3xl text-pink-vivid drop-shadow-sm sm:text-4xl">
-            🎀 きんどる本棚
+            きんどる本棚
           </h1>
         </div>
         <p className="max-w-prose text-sm text-ink-soft">
@@ -151,8 +147,6 @@ function Scallop() {
 interface ToolbarProps {
   query: string;
   setQuery: (v: string) => void;
-  status: StatusFilter;
-  setStatus: (v: StatusFilter) => void;
   sort: SortKey;
   setSort: (v: SortKey) => void;
   grouped: boolean;
@@ -167,9 +161,10 @@ function Toolbar(props: ToolbarProps) {
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
           {/* 検索 */}
           <label className="relative flex-1">
-            <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-ink-soft">
-              🔍
-            </span>
+            <PiMagnifyingGlassBold
+              className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-ink-soft"
+              aria-hidden="true"
+            />
             <input
               type="search"
               value={props.query}
@@ -196,33 +191,7 @@ function Toolbar(props: ToolbarProps) {
           </label>
         </div>
 
-        <div className="flex flex-wrap items-center gap-2">
-          {/* ステータスチップ */}
-          <div className="flex gap-1.5">
-            {STATUS_CHIPS.map((c) => {
-              const active = props.status === c.key;
-              return (
-                <button
-                  key={c.key}
-                  type="button"
-                  onClick={() => props.setStatus(c.key)}
-                  className={
-                    active
-                      ? "inline-flex items-center gap-1 rounded-full bg-pink px-3 py-1 text-sm font-medium text-white shadow-sm"
-                      : "inline-flex items-center gap-1 rounded-full border border-border-soft bg-cream px-3 py-1 text-sm text-ink-soft hover:border-pink hover:text-pink-vivid"
-                  }
-                >
-                  {active && (
-                    <span className="sparkle" aria-hidden="true">
-                      ✨
-                    </span>
-                  )}
-                  {c.label}
-                </button>
-              );
-            })}
-          </div>
-
+        <div className="flex flex-wrap items-center gap-3">
           {/* シリーズまとめトグル */}
           <button
             type="button"
@@ -231,10 +200,11 @@ function Toolbar(props: ToolbarProps) {
             onClick={() => props.setGrouped(!props.grouped)}
             className={
               props.grouped
-                ? "ml-auto inline-flex items-center gap-2 rounded-full bg-lavender px-3 py-1 text-sm font-medium text-indigo-900/80 shadow-sm"
-                : "ml-auto inline-flex items-center gap-2 rounded-full border border-border-soft bg-cream px-3 py-1 text-sm text-ink-soft hover:border-pink hover:text-pink-vivid"
+                ? "inline-flex items-center gap-2 rounded-full bg-lavender px-3 py-1 text-sm font-medium text-indigo-900/80 shadow-sm"
+                : "inline-flex items-center gap-2 rounded-full border border-border-soft bg-cream px-3 py-1 text-sm text-ink-soft hover:border-pink hover:text-pink-vivid"
             }
           >
+            <PiStackDuotone className="text-base" aria-hidden="true" />
             <span
               className={
                 props.grouped
@@ -251,7 +221,7 @@ function Toolbar(props: ToolbarProps) {
             シリーズでまとめる
           </button>
 
-          <span className="text-xs text-ink-soft">
+          <span className="ml-auto text-xs text-ink-soft">
             {numberFmt.format(props.resultCount)} 件
           </span>
         </div>
@@ -263,9 +233,10 @@ function Toolbar(props: ToolbarProps) {
 function EmptyState() {
   return (
     <div className="flex flex-col items-center justify-center gap-3 py-24 text-center">
-      <p className="font-display text-2xl text-pink">みつからなかった…🍰</p>
+      <PiBookmarksSimpleDuotone className="text-5xl text-pink/70" aria-hidden="true" />
+      <p className="font-display text-2xl text-pink">みつかりませんでした</p>
       <p className="text-sm text-ink-soft">
-        キーワードやフィルタを変えて、もう一度さがしてみてね。
+        キーワードを変えて、もう一度さがしてみてください。
       </p>
     </div>
   );
@@ -274,7 +245,7 @@ function EmptyState() {
 function Footer() {
   return (
     <footer className="border-t border-border-soft py-8 text-center text-xs text-ink-soft">
-      <p>🎀 きんどる本棚 — {numberFmt.format(stats.total)} 冊の蔵書ギャラリー</p>
+      <p>きんどる本棚 — {numberFmt.format(stats.total)} 冊の蔵書ギャラリー</p>
     </footer>
   );
 }

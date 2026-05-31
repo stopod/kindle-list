@@ -1,6 +1,5 @@
 import type { Book } from "~/lib/books";
 import { CoverImage } from "./CoverImage";
-import { StatusBadge } from "./StatusBadge";
 
 /** 1冊分の書影カード。クリックで Amazon 商品ページへ。 */
 export function BookCard({ book }: { book: Book }) {
@@ -14,11 +13,6 @@ export function BookCard({ book }: { book: Book }) {
     >
       <div className="relative aspect-2/3 overflow-hidden rounded-xl bg-cream">
         <CoverImage book={book} />
-
-        {/* ステータス（左上） */}
-        <div className="absolute left-1.5 top-1.5">
-          <StatusBadge status={book.status} />
-        </div>
 
         {/* 巻数（右上） */}
         {book.volume != null && (

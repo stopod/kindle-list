@@ -1,6 +1,5 @@
 import type { SeriesGroup } from "~/lib/books";
 import { CoverImage } from "./CoverImage";
-import { StatusBadge } from "./StatusBadge";
 
 /**
  * シリーズまとめカード。背後に重なった紙で「束」を表現し、全巻数を表示。
@@ -9,8 +8,6 @@ import { StatusBadge } from "./StatusBadge";
 export function SeriesCard({ group }: { group: SeriesGroup }) {
   const rep = group.representative;
   const multi = group.count > 1;
-  // シリーズ内に1冊でも既読があれば既読扱いのバッジ
-  const anyRead = group.books.some((b) => b.status === "READ");
 
   return (
     <a
@@ -31,10 +28,6 @@ export function SeriesCard({ group }: { group: SeriesGroup }) {
 
         <div className="relative h-full w-full overflow-hidden rounded-xl bg-cream ring-1 ring-border-soft">
           <CoverImage book={rep} />
-
-          <div className="absolute left-1.5 top-1.5">
-            <StatusBadge status={anyRead ? "READ" : rep.status} />
-          </div>
 
           {multi && (
             <div className="absolute right-1.5 top-1.5">

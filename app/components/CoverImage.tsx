@@ -1,9 +1,10 @@
 import { useState } from "react";
+import { PiBookOpenDuotone } from "react-icons/pi";
 import type { Book } from "~/lib/books";
 import { hueFromString } from "~/lib/books";
 
 /**
- * 書影画像。取得失敗時はシリーズ色から決まるパステルのグラデ地＋頭文字＋📖 を表示。
+ * 書影画像。取得失敗時はシリーズ色から決まるパステルのグラデ地＋頭文字＋本アイコンを表示。
  */
 export function CoverImage({ book }: { book: Book }) {
   const [errored, setErrored] = useState(false);
@@ -12,7 +13,7 @@ export function CoverImage({ book }: { book: Book }) {
   if (showFallback) {
     const hue = hueFromString(book.series || book.title);
     const bg = `linear-gradient(150deg, hsl(${hue} 90% 90%), hsl(${(hue + 40) % 360} 85% 82%))`;
-    const initial = (book.series || book.title).trim().charAt(0) || "📖";
+    const initial = (book.series || book.title).trim().charAt(0) || "?";
     return (
       <div
         className="flex h-full w-full flex-col items-center justify-center gap-1 p-3 text-center"
@@ -28,7 +29,7 @@ export function CoverImage({ book }: { book: Book }) {
         <span className="line-clamp-2 text-[10px] font-medium leading-tight text-white/90">
           {book.series || book.title}
         </span>
-        <span className="text-lg">📖</span>
+        <PiBookOpenDuotone className="mt-0.5 text-lg text-white/80" />
       </div>
     );
   }
