@@ -106,7 +106,7 @@ function Header() {
           </h1>
         </div>
         <p className="max-w-prose text-pretty text-sm leading-relaxed text-ink-soft">
-          わたしの Kindle 蔵書ギャラリー。表紙をクリックすると Amazon へ。
+          ゆめ★かわ
         </p>
         <ul className="flex flex-wrap gap-2">
           {pills.map((p) => (
