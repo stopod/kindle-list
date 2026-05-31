@@ -1,10 +1,10 @@
-# 🎀 きんどる本棚 (kidle-list)
+# 🎀 きんどる本棚 (kindle-list)
 
 自分の Kindle 蔵書(`kindle.csv`)を、ピンク × パステル × サブカルなギャラリーで眺める静的サイト。
 React Router v7（フレームワークモード / 事前レンダリング）で作り、GitHub Pages に公開します。
 
 - デザイン方針 … [DESIGN.md](./DESIGN.md)
-- 公開URL（例）… `https://<ユーザー名>.github.io/kidle-list/`
+- 公開URL（例）… `https://<ユーザー名>.github.io/kindle-list/`
 
 ## 機能
 
@@ -31,7 +31,7 @@ CSV を更新したら、コミットして push するだけで再ビルド＆�
 
 ```bash
 npm install
-npm run dev      # http://localhost:5173/kidle-list/
+npm run dev      # http://localhost:5173/kindle-list/
 ```
 
 ## 本番ビルド
@@ -45,7 +45,7 @@ npm run build    # prebuild(変換) → 事前レンダリング → postbuild(�
 
 ## GitHub Pages へ公開する手順
 
-1. リポジトリ名を **`kidle-list`** で作成し push（別名にする場合は下記参照）。
+1. リポジトリ名を **`kindle-list`** で作成し push（別名にする場合は下記参照）。
 2. GitHub のリポジトリ設定 → **Settings → Pages → Build and deployment → Source** を **GitHub Actions** にする。
 3. `main` に push すると [`.github/workflows/deploy.yml`](./.github/workflows/deploy.yml) が
    ビルドして Pages へデプロイします。
@@ -56,7 +56,7 @@ npm run build    # prebuild(変換) → 事前レンダリング → postbuild(�
 
 - `vite.config.ts` の `base`
 - `react-router.config.ts` の `basename`
-- あわせて `scripts/postbuild.mjs` の `kidle-list` も置き換え
+- あわせて `scripts/postbuild.mjs` の `kindle-list` も置き換え
 
 > ユーザーサイト（`<ユーザー名>.github.io`）やカスタムドメインのルート配信にする場合は、
 > `base` / `basename` を `"/"` にしてください。

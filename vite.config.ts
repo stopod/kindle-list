@@ -4,7 +4,7 @@ import { defineConfig } from "vite";
 
 export default defineConfig({
   // GitHub Pages のサブパスに合わせる（react-router.config.ts の basename と一致させる）
-  base: "/kidle-list/",
+  base: "/kindle-list/",
   plugins: [tailwindcss(), reactRouter()],
   resolve: {
     tsconfigPaths: true,
