@@ -83,35 +83,60 @@ function parseTitle(rawTitle) {
   let title = rawTitle.trim();
   let label = null;
 
-  // 末尾の (...) / （...） をレーベルとして切り出す
-  const labelMatch = title.match(/[（(]([^（）()]+)[）)]\s*$/);
-  if (labelMatch) {
-    label = labelMatch[1].trim();
-    title = title.slice(0, labelMatch.index).trim();
+  // 末尾の (...) / （...） をレーベルとして切り出す（複数連なっていれば全て剥がす）。
+  // ただし中身が数字だけの括弧は巻数なので剥がさない（例: 妹は知っている（３））。
+  let lm;
+  while ((lm = title.match(/[（(]([^（）()]+)[）)]\s*$/))) {
+    const inner = lm[1].trim();
+    if (/^[0-9０-９]+$/.test(inner)) break;
+    if (label === null) label = inner; // 表示用は最初（最も右）の1つ
+    title = title.slice(0, lm.index).trim();
   }
 
-  // 全角スペースを半角に寄せた版で巻数判定（series は元の見た目を保つ）
-  const normalized = toHalfWidthDigits(title);
+  // 【...】〔...〕（特典・限定などの注記）を任意位置から除去
+  let work = title
+    .replace(/[【〔][^【】〔〕]*[】〕]/g, " ")
+    .replace(/[\s　]+/g, " ")
+    .trim();
 
-  let volume = null;
-  let series = title;
+  // 全角数字を半角に寄せた版で巻数判定（series は元の見た目を保つ）。
+  // 全角→半角は1文字対応なので work とインデックスは一致する。
+  const normalized = toHalfWidthDigits(work);
 
-  // パターン: 末尾の "N巻" / "第N巻" / "(N)" / 末尾の独立した数字
-  const volPatterns = [
-    /[\s　]*第?\s*([0-9]+)\s*巻\s*$/, // ...N巻
-    /[\s　]*[（(]\s*([0-9]+)\s*[）)]\s*$/, // ...(N)
-    /[\s　]+([0-9]+)\s*$/, // ...␣N
+  // 明示的な巻数マーカー（「版」など曖昧なものは含めない）。
+  // 文字列の任意位置から探し、最も左に現れたものを採用 → その「前」をシリーズ名にする。
+  const markers = [
+    /第\s*([0-9]+)\s*巻/, // 第N巻
+    /([0-9]+)\s*巻/, // N巻
+    /\bvol\.?\s*([0-9]+)/i, // Vol.N / volN
+    /\bvolume\s*([0-9]+)/i, // VOLUME N
+    /\bsession\s*([0-9]+)/i, // session N
+    /[#＃]\s*([0-9]+)/, // #N
+    /[(（]\s*([0-9]+)\s*[)）]/, // (N) / （N）
   ];
-  for (const re of volPatterns) {
+  let best = null; // { index, volume }
+  for (const re of markers) {
     const m = normalized.match(re);
-    if (m) {
-      volume = Number(m[1]);
-      series = title.slice(0, m.index).replace(/[\s　]+$/, "");
-      break;
+    if (m && (best === null || m.index < best.index)) {
+      best = { index: m.index, volume: Number(m[1]) };
     }
   }
+  // 強いマーカーが無ければ、末尾の独立した数字（空白区切り）だけ拾う
+  if (best === null) {
+    const m = normalized.match(/[\s　]+([0-9]+)\s*$/);
+    if (m) best = { index: m.index, volume: Number(m[1]) };
+  }
 
-  series = series.replace(/[\s　]+$/, "").trim() || title;
+  let volume = null;
+  let series = work;
+  if (best) {
+    volume = best.volume;
+    // マーカー以降（巻数・副題）を捨て、前半をシリーズ名にする
+    const head = work.slice(0, best.index).replace(/[\s　]+$/, "").trim();
+    if (head) series = head;
+  }
+
+  series = series.replace(/[\s　]+$/, "").trim() || work;
   return { series, volume, label };
 }
 
@@ -163,7 +188,9 @@ const books = rows.slice(1).map((r, i) => {
 const total = books.length;
 const read = books.filter((b) => b.status === "READ").length;
 const unknown = total - read;
-const seriesCount = new Set(books.map((b) => b.series)).size;
+// UI のグルーピング（app/lib/books.ts の seriesKey）と同じ正規化で数える
+const seriesKey = (s) => s.normalize("NFKC").replace(/\s+/g, "").toLowerCase();
+const seriesCount = new Set(books.map((b) => seriesKey(b.series))).size;
 const authorCount = new Set(books.map((b) => b.authors).filter(Boolean)).size;
 
 const payload = {

@@ -105,8 +105,8 @@ function Header() {
             きんどる本棚
           </h1>
         </div>
-        <p className="max-w-prose text-sm text-ink-soft">
-          わたしの Kindle 蔵書ギャラリー。表紙をクリックすると Amazon の商品ページがひらきます。
+        <p className="max-w-prose text-pretty text-sm leading-relaxed text-ink-soft">
+          わたしの Kindle 蔵書ギャラリー。表紙をクリックすると Amazon へ。
         </p>
         <ul className="flex flex-wrap gap-2">
           {pills.map((p) => (

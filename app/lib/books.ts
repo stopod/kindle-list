@@ -99,20 +99,30 @@ function byVolume(a: Book, b: Book): number {
   return a.volume - b.volume;
 }
 
+/** シリーズ名の正規化キー（空白・全角半角・記号のゆれを吸収してまとめる） */
+function seriesKey(series: string): string {
+  return series
+    .normalize("NFKC")
+    .replace(/[\s]+/g, "")
+    .toLowerCase();
+}
+
 /** シリーズ単位にまとめる（並び順は books の並びを尊重して最初の出現順） */
 export function groupBySeries(books: Book[]): SeriesGroup[] {
   const map = new Map<string, Book[]>();
   for (const b of books) {
-    const arr = map.get(b.series);
+    const key = seriesKey(b.series);
+    const arr = map.get(key);
     if (arr) arr.push(b);
-    else map.set(b.series, [b]);
+    else map.set(key, [b]);
   }
   const groups: SeriesGroup[] = [];
-  for (const [series, arr] of map) {
+  for (const [key, arr] of map) {
     const sorted = [...arr].sort(byVolume);
     groups.push({
-      key: series,
-      series,
+      key,
+      // 表示名は代表（最小巻）の series をそのまま使う
+      series: sorted[0].series,
       books: sorted,
       representative: sorted[0],
       count: arr.length,
